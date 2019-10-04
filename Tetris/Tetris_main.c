@@ -12,6 +12,12 @@
 #include "Tetris_display.h"
 #include "Tetris_operation.h"
 
+static void scene_init(void)
+{
+    logic_init();
+    display_init();
+}
+
 int main(int argc, char *argv[])
 {
 	/* Step 1: Initialize the GLUT library and negotiate a session with the
@@ -26,7 +32,6 @@ int main(int argc, char *argv[])
 	/* Step 3: Set the initial window size in pixels */
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-
 	/* Step 4: Create a top-level window. The name will be provided to the window
 	   system as the window's name. Implicitly, the current window is set
 	   to the newly created window. Each created window has a unique associated
@@ -34,6 +39,7 @@ int main(int argc, char *argv[])
 	   can be done immediately after the window is created. */
     glutCreateWindow("TETRIS");
 
+    scene_init();
 	/* Step 5: Define the GLUT callbacks for display, window, keyboard,
 	   mouse, etc. management */
     glutDisplayFunc(display_callback);
