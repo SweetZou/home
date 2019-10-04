@@ -73,9 +73,10 @@ typedef struct image_data {
 } gif_image_data;
 
 typedef struct data_stream {
-	gif_logic_screen_descriptor descriptior;
+	gif_logic_screen_descriptor screen_descriptior;
 	gif_color* global_color_table;
-	gif_image_descriptor 
+	gif_image_descriptor image_descriptor;
+	gif_image_data image_data;
 } gif_data_stream;
 
 typedef struct tail {
@@ -84,7 +85,7 @@ typedef struct tail {
 
 typedef struct gif {
 	gif_header header;
-	gif_stream stream;
+	gif_data_stream stream;
 	gif_tail tail;
 } gif_struct;
 
