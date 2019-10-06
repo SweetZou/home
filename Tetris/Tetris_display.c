@@ -89,33 +89,76 @@ void display_deinit(void)
 static void display_bmp_add(BmpData* bmp, int offset_x, int offset_y)
 {
     int x, y;
-    for (x = 0; (x < bmp->Width) && (x + offset_x < screen_bmp.Width); x++)
+    int bmp_data_pointer = 0;
+    for (y = 0; (y < bmp->Height) && (y + offset_y < screen_bmp.Height); y++)
     {
-        for (y = 0; (y < bmp->Height) && (y + offset_y < screen_bmp.Height); y++)
+        for (x = 0; (x < bmp->Width) && (x + offset_x < screen_bmp.Width); x++)
         {
-            memcpy(&screen_bmp.PixelData[((y + offset_y) * screen_bmp.Width + x + offset_x) * 3],
-                   &bmp->PixelData[(y * bmp->Width + x) * 3],
-                   3);
+            if ((bmp->PixelData[bmp_data_pointer] == 255)
+                && (bmp->PixelData[bmp_data_pointer + 1] == 255)
+                && (bmp->PixelData[bmp_data_pointer + 2] == 255))
+            {
+                //nothing to do
+            }
+            else
+            {
+                memcpy(&screen_bmp.PixelData[((y + offset_y) * screen_bmp.Width + x + offset_x) * 3],
+                       &bmp->PixelData[bmp_data_pointer],
+                       3);
+            }
+            bmp_data_pointer += 3;
         }
+        bmp_data_pointer = (bmp_data_pointer + 3) & ~3;
     }
 }
+
+
 
 static void display_gm_ready(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    //BmpDraw(&bmp[RES_PHONE]);
-    //glTexSubImage2D(GL_TEXTURE_2D,
-    //                0,
-    //                0,
-    //                SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height,
-    //                bmp[RES_TETRIS_BG].Width,
-    //                bmp[RES_TETRIS_BG].Height,
-    //                GL_RGB,
-    //                GL_UNSIGNED_BYTE,
-    //                bmp[RES_TETRIS_BG].PixelData);
-    display_bmp_add(&bmp[RES_TETRIS_BG], 0, SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
-	//display_bmp_add(&bmp[RES_TETRIS_GM_TITLE], 0, 0);
-	//display_bmp_add(&bmp[RES_TETRIS_GM_MENU_BG], 0, 0);
+    display_bmp_add(&bmp[RES_TETRIS_BG],
+                    0,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
+	display_bmp_add(&bmp[RES_TETRIS_GM_TITLE],
+                    (320 - bmp[RES_TETRIS_GM_TITLE].Width) >> 1,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_GM_TITLE].Height - 71);
+	display_bmp_add(&bmp[RES_TETRIS_GM_MENU_BG],
+                    (320 - bmp[RES_TETRIS_GM_MENU_BG].Width) >> 1,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_GM_MENU_BG].Height - 156);
+    {
+        BmpData* normal_part = get_sub_bmp(&bmp[RES_TETRIS_GM_MENU_START],
+                                           0,
+                                           bmp[RES_TETRIS_GM_MENU_START].Height >> 1,
+                                           bmp[RES_TETRIS_GM_MENU_START].Width,
+                                           bmp[RES_TETRIS_GM_MENU_START].Height >> 1);
+        display_bmp_add(normal_part,
+                        (320 - normal_part->Width) >> 1,
+                        SCREEN_HEIGHT - normal_part->Height - 200);
+        BmpDestroy(normal_part);
+    }
+    {
+        BmpData* normal_part = get_sub_bmp(&bmp[RES_TETRIS_GM_MENU_HELP],
+                                           0,
+                                           bmp[RES_TETRIS_GM_MENU_HELP].Height >> 1,
+                                           bmp[RES_TETRIS_GM_MENU_HELP].Width,
+                                           bmp[RES_TETRIS_GM_MENU_HELP].Height >> 1);
+        display_bmp_add(normal_part,
+                        (320 - normal_part->Width) >> 1,
+                        SCREEN_HEIGHT - normal_part->Height - 250);
+        BmpDestroy(normal_part);
+    }
+    {
+        BmpData* normal_part = get_sub_bmp(&bmp[RES_TETRIS_GM_MENU_EXIT],
+                                           0,
+                                           bmp[RES_TETRIS_GM_MENU_EXIT].Height >> 1,
+                                           bmp[RES_TETRIS_GM_MENU_EXIT].Width,
+                                           bmp[RES_TETRIS_GM_MENU_EXIT].Height >> 1);
+        display_bmp_add(normal_part,
+                        (320 - normal_part->Width) >> 1,
+                        SCREEN_HEIGHT - normal_part->Height - 300);
+        BmpDestroy(normal_part);
+    }
 	BmpDraw(&screen_bmp);
 	glFlush();
     glutSwapBuffers();

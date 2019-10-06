@@ -50,6 +50,36 @@ int BmpInit(char* bmpFile, BmpData* bmp)
 	return 0;
 }
 
+BmpData* get_sub_bmp(BmpData* bmp, int offset_x, int offset_y, int width, int height)
+{
+    int x, y;
+    int ret_data_pointer = 0;
+    int bmp_data_per_line = (bmp->Width * 3 + 3) & ~3;
+    BmpData* ret = (BmpData*)malloc(sizeof(BmpData));
+    ret->Width = width;
+    ret->Height = height;
+    ret->DataLen = ret->Width * 3;
+	ret->DataLen += 3;
+	ret->DataLen &= ~3;
+	ret->DataLen *= ret->Height;
+    ret->PixelData = (GLubyte*)malloc(bmp->DataLen);
+    memset(ret->PixelData, 0, ret->DataLen);
+    
+    for (y = 0 ; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            memcpy(&ret->PixelData[ret_data_pointer],
+                   &bmp->PixelData[(y + offset_y) * bmp_data_per_line + (x + offset_x) * 3],
+                   3);
+            ret_data_pointer += 3;
+        }
+        ret_data_pointer = (ret_data_pointer + 3) & ~3;
+    }
+    
+    return ret;
+}
+
 void BmpToRGB(BmpData* bmp)
 {
 	int col;
