@@ -65,6 +65,10 @@ void display_init(void)
     BmpInit("Resource/gm_main.bmp", &bmp[RES_TETRIS_GM_MAIN]);
 	BmpToRGB(&bmp[RES_TETRIS_GM_MAIN]);
     
+    memset(&bmp[RES_TETRIS_GM_BOTTEM], 0, sizeof(BmpData));
+    BmpInit("Resource/gm_bottem.bmp", &bmp[RES_TETRIS_GM_BOTTEM]);
+	BmpToRGB(&bmp[RES_TETRIS_GM_BOTTEM]);
+    
     memset(&bmp[RES_TETRIS_GM_BLOCK], 0, sizeof(BmpData));
     BmpInit("Resource/gm_block.bmp", &bmp[RES_TETRIS_GM_BLOCK]);
 	BmpToRGB(&bmp[RES_TETRIS_GM_BLOCK]);
@@ -72,6 +76,18 @@ void display_init(void)
     memset(&bmp[RES_TETRIS_GM_NUMBER], 0, sizeof(BmpData));
     BmpInit("Resource/gm_number.bmp", &bmp[RES_TETRIS_GM_NUMBER]);
 	BmpToRGB(&bmp[RES_TETRIS_GM_NUMBER]);
+    
+    memset(&bmp[RES_TETRIS_BTN_PAUSE], 0, sizeof(BmpData));
+    BmpInit("Resource/btn_pause.bmp", &bmp[RES_TETRIS_BTN_PAUSE]);
+	BmpToRGB(&bmp[RES_TETRIS_BTN_PAUSE]);
+    
+    memset(&bmp[RES_TETRIS_BTN_ENSURE], 0, sizeof(BmpData));
+    BmpInit("Resource/btn_ensure.bmp", &bmp[RES_TETRIS_BTN_ENSURE]);
+	BmpToRGB(&bmp[RES_TETRIS_BTN_ENSURE]);
+    
+    memset(&bmp[RES_TETRIS_BTN_CANCEL], 0, sizeof(BmpData));
+    BmpInit("Resource/btn_cancel.bmp", &bmp[RES_TETRIS_BTN_CANCEL]);
+	BmpToRGB(&bmp[RES_TETRIS_BTN_CANCEL]);
     
     screen_bmp_init();
 }
@@ -112,11 +128,8 @@ static void display_bmp_add(BmpData* bmp, int offset_x, int offset_y)
     }
 }
 
-
-
-static void display_gm_ready(void)
+static void display_gm_menu(U8 page_status)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
     display_bmp_add(&bmp[RES_TETRIS_BG],
                     0,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
@@ -127,9 +140,14 @@ static void display_gm_ready(void)
                     (320 - bmp[RES_TETRIS_GM_MENU_BG].Width) >> 1,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_GM_MENU_BG].Height - 156);
     {
+        int offset_y = 0;
+        if (page_status != PAGE_MENU_STATUS_START)
+        {
+            offset_y = bmp[RES_TETRIS_GM_MENU_START].Height >> 1;
+        }
         BmpData* normal_part = get_sub_bmp(&bmp[RES_TETRIS_GM_MENU_START],
                                            0,
-                                           bmp[RES_TETRIS_GM_MENU_START].Height >> 1,
+                                           offset_y,
                                            bmp[RES_TETRIS_GM_MENU_START].Width,
                                            bmp[RES_TETRIS_GM_MENU_START].Height >> 1);
         display_bmp_add(normal_part,
@@ -138,9 +156,14 @@ static void display_gm_ready(void)
         BmpDestroy(normal_part);
     }
     {
+        int offset_y = 0;
+        if (page_status != PAGE_MENU_STATUS_HELP)
+        {
+            offset_y = bmp[RES_TETRIS_GM_MENU_HELP].Height >> 1;
+        }
         BmpData* normal_part = get_sub_bmp(&bmp[RES_TETRIS_GM_MENU_HELP],
                                            0,
-                                           bmp[RES_TETRIS_GM_MENU_HELP].Height >> 1,
+                                           offset_y,
                                            bmp[RES_TETRIS_GM_MENU_HELP].Width,
                                            bmp[RES_TETRIS_GM_MENU_HELP].Height >> 1);
         display_bmp_add(normal_part,
@@ -149,9 +172,14 @@ static void display_gm_ready(void)
         BmpDestroy(normal_part);
     }
     {
+        int offset_y = 0;
+        if (page_status != PAGE_MENU_STATUS_EXIT)
+        {
+            offset_y = bmp[RES_TETRIS_GM_MENU_EXIT].Height >> 1;
+        }
         BmpData* normal_part = get_sub_bmp(&bmp[RES_TETRIS_GM_MENU_EXIT],
                                            0,
-                                           bmp[RES_TETRIS_GM_MENU_EXIT].Height >> 1,
+                                           offset_y,
                                            bmp[RES_TETRIS_GM_MENU_EXIT].Width,
                                            bmp[RES_TETRIS_GM_MENU_EXIT].Height >> 1);
         display_bmp_add(normal_part,
@@ -160,20 +188,38 @@ static void display_gm_ready(void)
         BmpDestroy(normal_part);
     }
 	BmpDraw(&screen_bmp);
-	glFlush();
-    glutSwapBuffers();
+}
+
+static void display_gm_run(Tetris_config* config)
+{
+    display_bmp_add(&bmp[RES_TETRIS_BG],
+                    0,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
+    display_bmp_add(&bmp[RES_TETRIS_GM_MAIN],
+                    18,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_GM_MAIN].Height - 40);
+    display_bmp_add(&bmp[RES_TETRIS_GM_BOTTEM],
+                    0,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
+    display_bmp_add(&bmp[RES_TETRIS_BTN_PAUSE],
+                    18,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height + 7);
+    BmpDraw(&screen_bmp);
 }
 
 void display_callback(void)
 {
 	Tetris_config config = get_config();
-    printf("Game status: %d.\n", config.game_status);
+    //printf("Game status: %d.\n", config.game_status);
+    
+    glClear(GL_COLOR_BUFFER_BIT);
 	switch (config.game_status)
     {
-        case GAME_STATUS_READY:
-            display_gm_ready();
+        case GAME_STATUS_MENU:
+            display_gm_menu(config.page_status);
             break;
-        case GAME_STATUS_START:
+        case GAME_STATUS_RUN:
+            display_gm_run(&config);
             break;
         case GAME_STATUS_PAUSE:
             break;
@@ -182,7 +228,8 @@ void display_callback(void)
         case GAME_STATUS_EXIT:
             break;
     }
-    //glutPostRedisplay();
-	//glutSwapBuffers();
+	glFlush();
+    glutSwapBuffers();
+    glutPostRedisplay();
 }
 

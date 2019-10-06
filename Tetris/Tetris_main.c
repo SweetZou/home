@@ -15,6 +15,7 @@
 
 static void scene_init(void)
 {
+    operation_init();
     logic_init();
     display_init();
 }
@@ -46,8 +47,8 @@ int main(int argc, char *argv[])
 	   mouse, etc. management */
     glutDisplayFunc(display_callback);
     //glutReshapeFunc(reshape_callback);
-    glutKeyboardFunc(keyboard_callback);
-	//glutSpecialFunc(specialkey_callback);
+    glutKeyboardUpFunc(keyboard_callback);
+	glutSpecialUpFunc(specialkey_callback);
 	glutIdleFunc(idle_callback);
 
 	/* Final Step: Enter the GLUT event processing loop. Once called, this
