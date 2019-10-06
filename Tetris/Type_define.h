@@ -2,7 +2,7 @@
 #define __TYPE_DEFINE_H__
 
 #define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 800
+#define SCREEN_HEIGHT 743
 
 typedef unsigned int U32;
 typedef unsigned short int U16;
