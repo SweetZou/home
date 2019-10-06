@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	/* Step 2: Set the initial display mode, which is used when creating
 	   top-level windows, subwindows, and overlays to determine the
 	   OpenGL display mode for the to-be-created window or overlay */
-    glutInitDisplayMode(GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowPosition(0, 0);
 
 	/* Step 3: Set the initial window size in pixels */

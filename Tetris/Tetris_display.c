@@ -89,12 +89,12 @@ void display_deinit(void)
 static void display_bmp_add(BmpData* bmp, int offset_x, int offset_y)
 {
     int x, y;
-    for (x = offset_x; x < bmp->Width /*&& x < screen_bmp.Width*/; x++)
+    for (x = 0; (x < bmp->Width) && (x + offset_x < screen_bmp.Width); x++)
     {
-        for (y = offset_y; y < bmp->Height /*&& y < screen_bmp.Height*/; y++)
+        for (y = 0; (y < bmp->Height) && (y + offset_y < screen_bmp.Height); y++)
         {
-            memcpy(&screen_bmp.PixelData[y * screen_bmp.Width + x],
-                   &bmp->PixelData[(y - offset_y) * bmp->Width + x - offset_x],
+            memcpy(&screen_bmp.PixelData[((y + offset_y) * screen_bmp.Width + x + offset_x) * 3],
+                   &bmp->PixelData[(y * bmp->Width + x) * 3],
                    3);
         }
     }
@@ -103,13 +103,22 @@ static void display_bmp_add(BmpData* bmp, int offset_x, int offset_y)
 static void display_gm_ready(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    glViewport(0, 20, SCREEN_WIDTH,SCREEN_HEIGHT);
-    //display_bmp_add(&bmp[RES_TETRIS_BG], 0, SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
+    //BmpDraw(&bmp[RES_PHONE]);
+    //glTexSubImage2D(GL_TEXTURE_2D,
+    //                0,
+    //                0,
+    //                SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height,
+    //                bmp[RES_TETRIS_BG].Width,
+    //                bmp[RES_TETRIS_BG].Height,
+    //                GL_RGB,
+    //                GL_UNSIGNED_BYTE,
+    //                bmp[RES_TETRIS_BG].PixelData);
+    display_bmp_add(&bmp[RES_TETRIS_BG], 0, SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
 	//display_bmp_add(&bmp[RES_TETRIS_GM_TITLE], 0, 0);
 	//display_bmp_add(&bmp[RES_TETRIS_GM_MENU_BG], 0, 0);
 	BmpDraw(&screen_bmp);
 	glFlush();
-    
+    glutSwapBuffers();
 }
 
 void display_callback(void)
