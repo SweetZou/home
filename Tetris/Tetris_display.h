@@ -1,6 +1,15 @@
 #ifndef __TETRIS_DISPLAY_H__
 #define __TETRIS_DISPLAY_H__
 
+#define GM_MAIN_X 18
+#define GM_MAIN_Y 40
+#define GM_LEVEL_X 266
+#define GM_LEVEL_Y 160
+#define GM_SCORE_X 248
+#define GM_SCORE_Y 219
+#define GM_HIGHEST_SCORE_X 248
+#define GM_HIGHEST_SCORE_Y 279
+
 typedef enum resource_id {
     RES_PHONE = 0,
     RES_TETRIS_BG,

@@ -134,10 +134,10 @@ static void display_gm_menu(U8 page_status)
                     0,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
 	display_bmp_add(&bmp[RES_TETRIS_GM_TITLE],
-                    (320 - bmp[RES_TETRIS_GM_TITLE].Width) >> 1,
+                    (SCREEN_WIDTH - bmp[RES_TETRIS_GM_TITLE].Width) >> 1,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_GM_TITLE].Height - 71);
 	display_bmp_add(&bmp[RES_TETRIS_GM_MENU_BG],
-                    (320 - bmp[RES_TETRIS_GM_MENU_BG].Width) >> 1,
+                    (SCREEN_WIDTH - bmp[RES_TETRIS_GM_MENU_BG].Width) >> 1,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_GM_MENU_BG].Height - 156);
     {
         int offset_y = 0;
@@ -151,7 +151,7 @@ static void display_gm_menu(U8 page_status)
                                            bmp[RES_TETRIS_GM_MENU_START].Width,
                                            bmp[RES_TETRIS_GM_MENU_START].Height >> 1);
         display_bmp_add(normal_part,
-                        (320 - normal_part->Width) >> 1,
+                        (SCREEN_WIDTH - normal_part->Width) >> 1,
                         SCREEN_HEIGHT - normal_part->Height - 200);
         BmpDestroy(normal_part);
     }
@@ -167,7 +167,7 @@ static void display_gm_menu(U8 page_status)
                                            bmp[RES_TETRIS_GM_MENU_HELP].Width,
                                            bmp[RES_TETRIS_GM_MENU_HELP].Height >> 1);
         display_bmp_add(normal_part,
-                        (320 - normal_part->Width) >> 1,
+                        (SCREEN_WIDTH - normal_part->Width) >> 1,
                         SCREEN_HEIGHT - normal_part->Height - 250);
         BmpDestroy(normal_part);
     }
@@ -183,11 +183,41 @@ static void display_gm_menu(U8 page_status)
                                            bmp[RES_TETRIS_GM_MENU_EXIT].Width,
                                            bmp[RES_TETRIS_GM_MENU_EXIT].Height >> 1);
         display_bmp_add(normal_part,
-                        (320 - normal_part->Width) >> 1,
+                        (SCREEN_WIDTH - normal_part->Width) >> 1,
                         SCREEN_HEIGHT - normal_part->Height - 300);
         BmpDestroy(normal_part);
     }
-	BmpDraw(&screen_bmp);
+}
+
+static U32 power(U8 index, U8 base)
+{
+    U32 ret = 1;
+    while (index > 0)
+    {
+        ret *= base;
+        index--;
+    }
+    return ret;
+}
+
+static void display_number(U32 number, S8 digit, U16 offset_x, U16 offset_y)
+{
+    U16 number_add_offset_x = 0;
+    number %= power(digit, 10);
+    while (--digit >= 0)
+    {
+        int buffer_offset_x = number / power(digit, 10) * bmp[RES_TETRIS_GM_NUMBER].Width / 10;
+        BmpData* number_bmp = get_sub_bmp(&bmp[RES_TETRIS_GM_NUMBER],
+                                          buffer_offset_x,
+                                          0,
+                                          bmp[RES_TETRIS_GM_NUMBER].Width / 10,
+                                          bmp[RES_TETRIS_GM_NUMBER].Height);
+        display_bmp_add(number_bmp,
+                        offset_x + number_add_offset_x,
+                        SCREEN_HEIGHT - offset_y - bmp[RES_TETRIS_GM_NUMBER].Height);
+        BmpDestroy(number_bmp);
+        number_add_offset_x += bmp[RES_TETRIS_GM_NUMBER].Width / 10;
+    }
 }
 
 static void display_gm_run(Tetris_config* config)
@@ -196,15 +226,27 @@ static void display_gm_run(Tetris_config* config)
                     0,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
     display_bmp_add(&bmp[RES_TETRIS_GM_MAIN],
-                    18,
-                    SCREEN_HEIGHT - bmp[RES_TETRIS_GM_MAIN].Height - 40);
+                    GM_MAIN_X,
+                    SCREEN_HEIGHT - bmp[RES_TETRIS_GM_MAIN].Height - GM_MAIN_Y);
     display_bmp_add(&bmp[RES_TETRIS_GM_BOTTEM],
                     0,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height);
+    display_number(config->current_level, 2, GM_LEVEL_X, GM_LEVEL_Y);
+    display_number(config->current_score, 6, GM_SCORE_X, GM_SCORE_Y);
+    display_number(config->highest_score, 6, GM_HIGHEST_SCORE_X, GM_HIGHEST_SCORE_Y);
     display_bmp_add(&bmp[RES_TETRIS_BTN_PAUSE],
                     18,
                     SCREEN_HEIGHT - bmp[RES_TETRIS_BG].Height + 7);
-    BmpDraw(&screen_bmp);
+}
+
+static void display_gm_pause(U8 page_status)
+{
+    
+}
+
+static void display_gm_over(U8 page_status)
+{
+    
 }
 
 void display_callback(void)
@@ -222,12 +264,15 @@ void display_callback(void)
             display_gm_run(&config);
             break;
         case GAME_STATUS_PAUSE:
+            display_gm_pause(config.page_status);
             break;
         case GAME_STATUS_OVER:
+            display_gm_over(config.page_status);
             break;
         case GAME_STATUS_EXIT:
             break;
     }
+	BmpDraw(&screen_bmp);
 	glFlush();
     glutSwapBuffers();
     glutPostRedisplay();

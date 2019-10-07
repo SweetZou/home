@@ -1,7 +1,7 @@
 #ifndef __TETRIS_CONFIG_H__
 #define __TETRIS_CONFIG_H__
 
-#define MAX_ROW 48
+#define MAX_ROW (48 + 4)
 #define MAX_COL 32
 
 typedef enum GAME_STATUS {
@@ -28,7 +28,7 @@ typedef enum PAGE_GAME_STATUS {
 } page_game_status_enum;
 
 typedef enum GAME_LEVEL {
-    GAME_LEVEL_1 = 0,
+    GAME_LEVEL_1 = 1,
     GAME_LEVEL_2,
     GAME_LEVEL_3,
     GAME_LEVEL_4,
@@ -52,19 +52,38 @@ typedef enum GAME_ITEM {
     GAME_ITEM_MAX
 } game_item_enum;
 
+typedef enum GAME_ITEM_STATUS {
+    GAME_ITEM_STATUS_1 = 0,
+    GAME_ITEM_STATUS_2,
+    GAME_ITEM_STATUS_3,
+    GAME_ITEM_STATUS_4,
+    GAME_ITEM_STATUS_MAX
+} game_item_status_enum;
+
+typedef struct unit {
+    U8 color:4;
+    U8 filled:1;
+    U8 status:1;
+    U8 reserve:2;
+} unit_block;
+
 typedef struct config {
 	U16 game_status:5;
 	U16 page_status:5;
 	U16 current_level:6;
-	U8 current_item;
-	U8 next_item;
+	U8 current_item:4;
+	U8 current_item_status:3;
+	U8 current_item_flag:1;
+	U8 next_item:4;
+	U8 next_item_status:3;
+	U8 next_item_flag:1;
 	U8 current_row;
-	U8 current_col;
+	S8 current_col;
 	U8 max_row;
 	U8 max_col;
-	U8 matrix[MAX_ROW][MAX_COL];
+	unit_block matrix[MAX_ROW][MAX_COL];
 	U32 current_score;
-	U32 high_score[10];
+	U32 highest_score;
 } Tetris_config;
 
 
