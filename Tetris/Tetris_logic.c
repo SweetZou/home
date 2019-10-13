@@ -81,6 +81,27 @@ int random(U8 range)
     return (clock() * 47 + 23) % range;
 }
 
+static void generate_block(U8 item_index, U8 item_status)
+{
+    switch(item_index)
+    {
+        case GAME_ITEM_SQUARE:
+            break;
+        case GAME_ITEM_Z:
+            break;
+        case GAME_ITEM_BACK_Z:
+            break;
+        case GAME_ITEM_L:
+            break;
+        case GAME_ITEM_BACK_L:
+            break;
+        case GAME_ITEM_T:
+            break;
+        case GAME_ITEM_I:
+            break;
+    }
+}
+
 static void generate_next_item()
 {
     if (config.next_item_flag == DEACTIVATE)
@@ -133,6 +154,16 @@ static void current_item_run(U8 command)
             
         }
         counter++;
+    }
+    else
+    {
+        if (config.next_item_flag == ACTIVATE)
+        {
+            config.current_item_flag = ACTIVATE;
+            config.current_item = config.next_item;
+            config.current_item_status = config.next_item_status;
+            config.next_item_flag = DEACTIVATE;
+        }
     }
 }
 
